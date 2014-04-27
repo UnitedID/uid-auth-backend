@@ -1,0 +1,8 @@
+.idea/
+*.iml
+target/*
+out/
+web-app/WEB-INF/tld/*
+stacktrace.log
+grails-app/conf/Config.groovy
+grails-app/conf/DataSource.groovy

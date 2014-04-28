@@ -9,8 +9,6 @@ class CredentialController {
     def add() {
         def json = request.JSON
 
-        print json
-
         if (!json?.addCreds?.version || !json?.addCreds?.userId || !json?.addCreds?.factors) {
             throw new IllegalArgumentException("Bad JSON payload")
         }
@@ -36,6 +34,20 @@ class CredentialController {
     }
 
     def revoke() {
+        def response = [action: "revokeCred", status: false]
 
+        CredentialStore credential = CredentialStore.createCriteria().get() {
+            eq 'credential.credentialId', params.credentialId
+        }
+
+        def cMap = credential.credential as Map
+        cMap.status = "revoked"
+        credential.credential = cMap
+
+        if (credential.save(failOnError:true, flush: true)) {
+            response.status = true
+        }
+
+        render response as JSON
     }
 }

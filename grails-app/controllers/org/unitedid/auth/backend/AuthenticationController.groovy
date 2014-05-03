@@ -1,28 +1,35 @@
 package org.unitedid.auth.backend
-
 import grails.converters.JSON
-import org.unitedid.auth.factors.PasswordFactor
 import org.unitedid.auth.hasher.YubiHSMHasher
 import org.unitedid.auth.hasher.impl.Hasher
 
 class AuthenticationController {
+    def credentialType = [
+            'password': 'org.unitedid.auth.factors.PasswordFactor',
+            'oathtotp': 'org.unitedid.auth.factors.OathFactor',
+            'oathhotp': 'org.unitedid.auth.factors.OathFactor'
+    ]
+
 
     def verifyCredentials() {
         def json = request.JSON
 
         Hasher hasher = (Hasher) new YubiHSMHasher()
 
+        def fail = 0
         json.auth.factors.each {
-            if (it.type == 'password') {
-                def auth = new PasswordFactor("authenticate", it, params.id)
-                if (!auth.authenticate(hasher)) {
-                    def response = [action: "auth", status: false]
-                    render response as JSON
-                    return
-                }
+            def credential
+            if (credentialType.containsKey(it.type)) {
+                credential = this.class.classLoader
+                        .loadClass(credentialType[it.type], true, false)
+                        .newInstance(jsonRequest: it, userId: params.id)
+
+            }
+            if (!credential.authenticate(hasher)) {
+                fail++
             }
         }
-        def b = [action: "auth", status: true]
-        render b as JSON
+        def response = [action: "auth", status: (fail == 0)]
+        render response as JSON
     }
 }

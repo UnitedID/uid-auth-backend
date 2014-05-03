@@ -23,7 +23,12 @@ class YubiHSMHasher implements Hasher {
     }
 
     @Override
-    def loadTempKey(String nonce, int keyHandle, String aead) {
-        return null  //To change body of implemented methods use File | Settings | File Templates.
+    def validateHOTP(int keyHandle, String nonce, String aead, int counter, String userCode, int lookAhead) {
+        return hsm.validateOathHOTP(keyHandle, nonce, aead, counter, userCode, lookAhead)
+    }
+
+    @Override
+    def validateTOTP(int keyHandle, String nonce, String aead, String userCode) {
+        return hsm.validateOathTOTP(keyHandle, nonce, aead, userCode)
     }
 }

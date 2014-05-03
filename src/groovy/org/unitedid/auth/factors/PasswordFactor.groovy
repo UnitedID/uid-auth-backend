@@ -2,7 +2,7 @@ package org.unitedid.auth.factors
 import grails.util.Holders
 import groovy.util.logging.Log4j
 import org.unitedid.auth.backend.CredentialStore
-import org.unitedid.auth.factors.impl.Factor
+import org.unitedid.auth.factors.impl.FactorImpl
 import org.unitedid.auth.hasher.impl.Hasher
 
 import javax.crypto.SecretKey
@@ -11,7 +11,9 @@ import javax.crypto.spec.PBEKeySpec
 import javax.security.auth.login.CredentialNotFoundException
 
 @Log4j
-class PasswordFactor implements Factor {
+class PasswordFactor implements FactorImpl {
+
+    static def config = Holders.config
 
     String derivedKey
     int iterations
@@ -28,36 +30,20 @@ class PasswordFactor implements Factor {
     // credentialStore may not be stored in the credential storage
     def credentialStore
 
-    static def config = Holders.config
+    def jsonRequest
 
-    public PasswordFactor(String action, Object req, String userId) {
-        this.userId = userId
-        credentialId = req.credentialId
-
-        if (action == "addCred") {
-            status = "active"
-            iterations = (int) config.pbkdf2.iterations
-            keyHandle = (int) config.yhsm.hmacKeyHandle
-            H1 = req.H1
-        } else if (action == "authenticate") {
-            credentialStore = CredentialStore.createCriteria().get {
-                eq 'credential.credentialId', credentialId
-            }
-            if (!credentialStore) {
-                throw new CredentialNotFoundException("Credential not found, id: " + credentialId)
-            }
-            if (credentialStore.credential.status != "active") {
-                throw new IllegalStateException("Credential revoked")
-            }
-            H1 = req.H1
-            salt = credentialStore.credential.salt
-            iterations = credentialStore.credential.iterations
-            keyHandle = credentialStore.credential.keyHandle
-        }
-
+    def parseJson() {
+        credentialId = jsonRequest.credentialId
+        H1 = jsonRequest.H1
     }
 
+    @Override
     def addCredential(Hasher hasher) {
+        parseJson()
+
+        status = "active"
+        iterations = (int) config.pbkdf2.iterations
+        keyHandle = (int) config.yhsm.hmacKeyHandle
         salt = hasher.random(16)
         calculateCredentialHash(hasher)
 
@@ -69,7 +55,24 @@ class PasswordFactor implements Factor {
         return false
     }
 
+    @Override
     def authenticate(Hasher hasher) {
+        parseJson()
+
+        print "Authenticating userId " + userId + " using credentialId " + credentialId
+        credentialStore = CredentialStore.createCriteria().get {
+            eq 'credential.credentialId', credentialId
+        }
+        if (!credentialStore) {
+            throw new CredentialNotFoundException("Credential not found, id: " + credentialId)
+        }
+        if (credentialStore.credential.status != "active") {
+            throw new IllegalStateException("Credential revoked")
+        }
+
+        salt = credentialStore.credential.salt
+        iterations = credentialStore.credential.iterations
+        keyHandle = credentialStore.credential.keyHandle
         calculateCredentialHash(hasher)
 
         //TODO: add a slow verifier method

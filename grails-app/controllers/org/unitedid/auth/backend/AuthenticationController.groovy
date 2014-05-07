@@ -7,7 +7,8 @@ class AuthenticationController {
     def credentialType = [
             'password': 'org.unitedid.auth.factors.PasswordFactor',
             'oathtotp': 'org.unitedid.auth.factors.OathFactor',
-            'oathhotp': 'org.unitedid.auth.factors.OathFactor'
+            'oathhotp': 'org.unitedid.auth.factors.OathFactor',
+            'yubikey': 'org.unitedid.auth.factors.YubiKeyFactor'
     ]
 
 

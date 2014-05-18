@@ -91,8 +91,6 @@ class YubiKeyFactor implements FactorImpl {
         client.setClientId(4711)
         def response = client.verify(userCode)
 
-        print response
-
         if (response) {
             switch (response.getStatus().toString()) {
                 case "OK":

@@ -59,7 +59,8 @@ class PasswordFactor implements FactorImpl {
     def authenticate(Hasher hasher) {
         parseJson()
 
-        print "Authenticating userId " + userId + " using credentialId " + credentialId
+        log.debug(String.format("Authenticating userId " + userId + " using credentialId " + credentialId))
+
         credentialStore = CredentialStore.createCriteria().get {
             eq 'credential.credentialId', credentialId
         }

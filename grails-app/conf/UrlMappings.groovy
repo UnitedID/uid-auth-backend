@@ -1,13 +1,17 @@
 class UrlMappings {
 
 	static mappings = {
-        "/credential/$id"(controller: "credential") {
-            action = [POST:"add", PUT:"update", DELETE: "revoke" ]
+
+        "/api/credential/$id"(controller: "credential") {
+            action = [POST:"add", DELETE: "revoke" ]
         }
 
-        "/authenticate/$id"(controller: "authentication") {
+        "/api/authenticate/$id"(controller: "authentication") {
             action = [POST: "verifyCredentials"]
         }
+
+        //"/login/$action?/$id?(.${format})?"(controller: "login") {}
+        //"/$controller/$action?/$id?(.${format})?" {}
 
         "500"(view:'/error')
 	}

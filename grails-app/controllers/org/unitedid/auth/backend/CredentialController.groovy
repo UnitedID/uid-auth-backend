@@ -1,17 +1,17 @@
 package org.unitedid.auth.backend
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
+import grails.util.Holders
 import org.unitedid.auth.hasher.YubiHSMHasher
 import org.unitedid.auth.hasher.impl.Hasher
 
 class CredentialController {
 
+    static def config = Holders.config
+    def credentialType = config.auth.credential.types
+
+    @Secured(["hasAnyRole('ROLE_ADMIN', 'ROLE_ADD_CRED')"])
     def add() {
-        def credentialType = [
-                'password': 'org.unitedid.auth.factors.PasswordFactor',
-                'oathtotp': 'org.unitedid.auth.factors.OathFactor',
-                'oathhotp': 'org.unitedid.auth.factors.OathFactor',
-                'yubikey': 'org.unitedid.auth.factors.YubiKeyFactor'
-        ]
         def json = request.JSON
 
         if (!json?.addCreds?.version || !json?.addCreds?.userId || !json?.addCreds?.factors) {
@@ -40,10 +40,8 @@ class CredentialController {
         def response = [action: "addCred", status: (fail == 0)]
         render response as JSON
     }
-    def update() {
 
-    }
-
+    @Secured(["hasAnyRole('ROLE_ADMIN', 'ROLE_REVOKE_CRED')"])
     def revoke() {
         def response = [action: "revokeCred", status: false]
 

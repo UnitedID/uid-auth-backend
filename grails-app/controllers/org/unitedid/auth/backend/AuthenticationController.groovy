@@ -1,17 +1,16 @@
 package org.unitedid.auth.backend
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
+import grails.util.Holders
 import org.unitedid.auth.hasher.YubiHSMHasher
 import org.unitedid.auth.hasher.impl.Hasher
 
 class AuthenticationController {
-    def credentialType = [
-            'password': 'org.unitedid.auth.factors.PasswordFactor',
-            'oathtotp': 'org.unitedid.auth.factors.OathFactor',
-            'oathhotp': 'org.unitedid.auth.factors.OathFactor',
-            'yubikey': 'org.unitedid.auth.factors.YubiKeyFactor'
-    ]
 
+    static def config = Holders.config
+    def credentialType = config.auth.credential.types
 
+    @Secured(["hasAnyRole('ROLE_ADMIN', 'ROLE_AUTH_CRED')"])
     def verifyCredentials() {
         def json = request.JSON
 

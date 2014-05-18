@@ -40,6 +40,8 @@ grails.project.dependency.resolution = {
         mavenLocal()
         grailsCentral()
         mavenCentral()
+        mavenRepo "http://repo.spring.io/milestone/"
+
         // uncomment these (or add new ones) to enable remote dependency resolution from public Maven repositories
         //mavenRepo "http://repository.codehaus.org"
         //mavenRepo "http://download.java.net/maven/2/"
@@ -62,14 +64,21 @@ grails.project.dependency.resolution = {
 
         // plugins for the compile step
         compile ":scaffolding:2.0.2"
-        compile ':cache:1.1.1'
+        //compile ':cache:1.1.1'
 
         // plugins needed at runtime but not for compilation
-        runtime ":hibernate:3.6.10.10" // or ":hibernate4:4.3.4"
+        //runtime ":hibernate:3.6.10.10" // or ":hibernate4:4.3.4"
         //runtime ":database-migration:1.3.8"
         runtime ":jquery:1.11.0.2"
         runtime ":resources:1.2.7"
-        compile ":mongodb:3.0.0"
+        compile ":mongodb:3.0.1"
+        compile ":spring-security-core:2.0-RC2"
+        compile ":mail:1.0.1"
+        /*compile ":jquery:1.11.0.2"
+        compile ":jquery-ui:1.10.3"
+        compile ":spring-security-ui:1.0-RC1"
+        compile ":famfamfam:1.0.1"
+        */
         // Uncomment these (or add new ones) to enable additional resources capabilities
         //runtime ":zipped-resources:1.0.1"
         //runtime ":cached-resources:1.1"

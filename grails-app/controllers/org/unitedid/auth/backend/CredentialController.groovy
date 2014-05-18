@@ -26,7 +26,7 @@ class CredentialController {
             def credential
             if (credentialType.containsKey(it.type)) {
                 credential = this.class.classLoader
-                        .loadClass(credentialType[it.type], true, false)
+                        .loadClass(credentialType[it.type])
                         .newInstance(jsonRequest: it, userId: params.id)
             } else {
                 def response = [action: "addCred", status: false]

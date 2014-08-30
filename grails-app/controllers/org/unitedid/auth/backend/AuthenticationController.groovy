@@ -2,9 +2,11 @@ package org.unitedid.auth.backend
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Holders
+import groovy.util.logging.Log4j
 import org.unitedid.auth.hasher.YubiHSMHasher
 import org.unitedid.auth.hasher.impl.Hasher
 
+@Log4j
 class AuthenticationController {
 
     static def config = Holders.config
@@ -18,6 +20,7 @@ class AuthenticationController {
 
         def fail = 0
         json.auth.factors.each {
+            log.debug("Got token(" + it.type +") for userId " + params.id)
             def credential
             if (credentialType.containsKey(it.type)) {
                 credential = this.class.classLoader

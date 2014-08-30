@@ -50,6 +50,7 @@ class PasswordFactor implements FactorImpl {
         def credential = new CredentialStore()
         credential.credential = this.asMap()
         if (credential.save(flush: true)) {
+            log.debug("Password credential added with id " + credentialId)
             return true
         }
         return false
@@ -58,8 +59,6 @@ class PasswordFactor implements FactorImpl {
     @Override
     def authenticate(Hasher hasher) {
         parseJson()
-
-        log.debug(String.format("Authenticating userId %s using credentialId %s", userId, credentialId))
 
         credentialStore = CredentialStore.createCriteria().get {
             eq 'credential.credentialId', credentialId
@@ -78,8 +77,12 @@ class PasswordFactor implements FactorImpl {
 
         //TODO: add a slow verifier method
         if (derivedKey == credentialStore.credential.derivedKey) {
+            log.debug("Password authentication successful for credentialId " + credentialId)
             return true
         }
+
+        log.debug("Password authentication failed for credentialId " + credentialId)
+
         return false
     }
 
